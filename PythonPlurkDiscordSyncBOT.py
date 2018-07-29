@@ -1,12 +1,36 @@
-from plurk_oauth import PlurkAPI
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from discord.ext.commands import Bot
+try:
+	from plurk_oauth import PlurkAPI
+except ImportError:
+	import pip
+	pip.main(['install','plurk-oauth'])
+	from plurk_oauth import PlurkAPI
+	
+try:
+	from apscheduler.schedulers.asyncio import AsyncIOScheduler
+except ImportError:
+	import pip
+	pip.main(['install','apscheduler'])	
+	from apscheduler.schedulers.asyncio import AsyncIOScheduler
+	
+try:	
+	import discord
+except ImportError:
+	import pip
+	pip.main(['install','discord.py'])	
+	import discord
+	
 from discord.ext import commands
+from discord.ext.commands import Bot
+try:
+	import base36
+except ImportError:
+	import pip
+	pip.main(['install','base36'])	
+	import base36
+	
 import urllib.request as urllib2
-import discord
 import sys
 import json
-import base36
 from datetime import datetime
 import datetime
 from html.parser import HTMLParser
@@ -249,9 +273,12 @@ def image(co):
        return
        sys.exc_clear()
 
-
+#手動指令檢查刪噗 預設 是檢查200則噗文
+DisableRemovePlurk = True #調為True禁用指令檢查，調為False啟用
 @bot.command(pass_context=True)
 async def RemovePlurk(ctx):
+    if DisableRemovePlurk :
+        return
     print('用戶指令輸入:', ctx.message.content)
     print('警告用戶使用RemovePlurk，可能會造成同步上的LAG')
     await bot.send_message(bot.get_channel(ChannelID),'RemovePlurking...')
@@ -270,9 +297,9 @@ async def RemovePlurk(ctx):
                     await bot.delete_message(message)
     await bot.send_message(bot.get_channel(ChannelID),'Done!')
 
-
+#刪噗檢查
 async def RemovePlurk():
-    async for message in bot.logs_from(bot.get_channel(ChannelID), limit=30): 
+    async for message in bot.logs_from(bot.get_channel(ChannelID), limit=30): #limit=30  是30則訊息 請勿過大 
         try:
             OldPlurkUrl = message.embeds[0]['author']['url']
             req = urllib2.Request(OldPlurkUrl)
@@ -365,13 +392,15 @@ async def start():
                 break
 
         if not tOPlurkURL == GetPlurks.PlurkURL:
-            for x in Tjs['BlockedWord']:
-                try:
-                    if GetPlurks.PlurkContent.index(x):
-                        print('偵測到特定字詞 不同步')
-                        return
-                except ValueError as e:
-                    pass
+            if not tjs['BlockedWord'][0] == 'null':
+                for x in Tjs['BlockedWord']:
+                    try:
+                        if GetPlurks.PlurkContent.index(x):
+                            print('偵測到特定字詞 不同步')
+                            return
+                    except ValueError as e:
+                        pass
+
             print('NewPlurk!:', GetPlurks.PlurkURL)
             print('-------------------------------------------')
             Uri = UserIURL(GetPlurks.PlurkUserID)
@@ -397,7 +426,10 @@ async def ErrorA(e):
     await bot.send_message(bot.get_channel(ChannelID),'```'+ '\n' + str(e) + '\n' + '```')
 try:
     scheduler = AsyncIOScheduler()
+    #偵測計時器部分 請勿調整過快 過快會對plurk伺服器造成負擔
     scheduler.add_job(start, 'interval' , seconds=10)
+    #定時檢查噗文是否被刪除 請勿過快 過快會對plurk伺服器造成更重的負擔
+    #預設 每30分鐘檢查30則噗文是否被刪除 
     scheduler.add_job(RemovePlurk,'interval' , seconds=1800)
     bot.run(TOKEN)
 except Exception as e:
