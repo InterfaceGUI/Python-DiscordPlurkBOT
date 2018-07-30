@@ -392,7 +392,7 @@ async def start():
                 break
 
         if not tOPlurkURL == GetPlurks.PlurkURL:
-            if not tjs['BlockedWord'][0] == 'null':
+            if not Tjs['BlockedWord'][0] == 'null':
                 for x in Tjs['BlockedWord']:
                     try:
                         if GetPlurks.PlurkContent.index(x):
