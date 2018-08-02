@@ -3,7 +3,7 @@
 ## 使用GCP架設機器人
 
 ### 1.新建一個VM執行個體 <br>
-### 2.使用SSH連線，輸入以下指令
+### 2.使用SSH連線，輸入以下指令。
 
 - `apt-get update`
 - `sudo apt-get install git`
