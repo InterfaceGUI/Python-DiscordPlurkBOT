@@ -13,15 +13,15 @@
 
 ### 3.初始設定
 
-`python3 install.py`
+- `python3 install.py`
 
 依提示填入 token、app key .... 等資訊
 
 ### 4.執行同步
 輸入
 
-`python3 PythonPlurkDiscordSyncBOT.py`
+- `python3 PythonPlurkDiscordSyncBOT.py`
 
 讓它迴圈執行
 
-`while true; do python3 PythonPlurkDiscordSyncBOT.py; done`
+- `while true; do python3 PythonPlurkDiscordSyncBOT.py; done`
