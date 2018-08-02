@@ -3,6 +3,8 @@
 ## 使用GCP架設機器人
 
 ### 1.新建一個VM執行個體 <br>
+
+- 開機磁碟 選擇 ` Debian GNU/Linux 9 (stretch) ` <br> 其餘自行斟酌調整
 ### 2.使用SSH連線，輸入以下指令。
 
 - `apt-get update`
