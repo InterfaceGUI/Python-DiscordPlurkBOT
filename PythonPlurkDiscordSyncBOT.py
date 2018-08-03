@@ -431,6 +431,8 @@ async def test(ctx):
 async def ErrorA(e):
     await bot.send_message(bot.get_channel(ChannelID),'```'+ '\n' + str(e) + '\n' + '```')
 
+async def err1(e):
+    await bot.send_message(muser,'scheduler 部分錯誤 \n ``` \n' + str(e) + '\n ```')
 
 @atexit.register
 def cleanup_function():
@@ -449,8 +451,8 @@ try:
         scheduler.add_job(RemovePlurk,'interval' , seconds=1800)
     except Exception as e:
         print('Error:',str(e))
-        
-        await bot.send_message(muser,'scheduler 部分錯誤 \n ``` \n' + str(e) + '\n ```'   
+        err1(e)
+         
     try:
         bot.run(TOKEN)
     except Exception as e:
