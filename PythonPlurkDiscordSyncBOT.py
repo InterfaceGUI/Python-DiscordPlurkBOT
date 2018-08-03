@@ -412,7 +412,10 @@ async def start():
                 GetPlurks.PlurkImg =  None
             embed.set_author(icon_url = Uri ,name=GetPlurks.PlurkDisplay_Name ,url=GetPlurks.PlurkURL)
             embed.set_footer(text = "BOT made by 科技狼(Tech wolf)",icon_url = "https://images-ext-2.discordapp.net/external/kRxpbJlpZCf9FMw11DTnL5HPzkDmozsZ3zeymhcsgFk/%3Fsize%3D2048/https/cdn.discordapp.com/avatars/226226332944564224/fa78ba0af70c004291e2f5d87672263c.jpg")
-            await bot.send_message(bot.get_channel(ChannelID),embed=embed)
+            try:
+                await bot.send_message(bot.get_channel(ChannelID),embed=embed)
+            except expression as identifier:
+                pass
             tOPlurkURL = GetPlurks.PlurkURL
             image(GetPlurks.PlurkContent)
             GetPlurks.PlurkImg =  None
@@ -424,6 +427,7 @@ async def test(ctx):
 
 async def ErrorA(e):
     await bot.send_message(bot.get_channel(ChannelID),'```'+ '\n' + str(e) + '\n' + '```')
+    
 try:
     scheduler = AsyncIOScheduler()
     #偵測計時器部分 請勿調整過快 過快會對plurk伺服器造成負擔
