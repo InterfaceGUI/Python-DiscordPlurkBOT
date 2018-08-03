@@ -1,3 +1,5 @@
+import atexit
+
 try:
 	from plurk_oauth import PlurkAPI
 except ImportError:
@@ -427,7 +429,14 @@ async def test(ctx):
 
 async def ErrorA(e):
     await bot.send_message(bot.get_channel(ChannelID),'```'+ '\n' + str(e) + '\n' + '```')
-    
+
+
+@atexit.register
+def cleanup_function():
+    print(sys._getframe().f_code.co_name)
+    bot.close()
+    Client.close()
+ 
 try:
     scheduler = AsyncIOScheduler()
     #偵測計時器部分 請勿調整過快 過快會對plurk伺服器造成負擔
@@ -435,9 +444,16 @@ try:
     #定時檢查噗文是否被刪除 請勿過快 過快會對plurk伺服器造成更重的負擔
     #預設 每30分鐘檢查30則噗文是否被刪除 
     scheduler.add_job(RemovePlurk,'interval' , seconds=1800)
-    bot.run(TOKEN)
+    try:
+        bot.run(TOKEN)
+    except Exception as e:
+        bot.close()
+        Client.close()
+        print('Error:',str(e))
 except Exception as e:
     ErrorA(e)
+    bot.close()
+    Client.close()
     print('Error:',str(e))
 
 
