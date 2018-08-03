@@ -436,20 +436,26 @@ def cleanup_function():
     print(sys._getframe().f_code.co_name)
     bot.close()
     Client.close()
- 
-try:
-    scheduler = AsyncIOScheduler()
-    #偵測計時器部分 請勿調整過快 過快會對plurk伺服器造成負擔
-    scheduler.add_job(start, 'interval' , seconds=10)
-    #定時檢查噗文是否被刪除 請勿過快 過快會對plurk伺服器造成更重的負擔
-    #預設 每30分鐘檢查30則噗文是否被刪除 
-    scheduler.add_job(RemovePlurk,'interval' , seconds=1800)
+
+try:    
+    try:
+        scheduler = AsyncIOScheduler()
+        #偵測計時器部分 請勿調整過快 過快會對plurk伺服器造成負擔
+        scheduler.add_job(start, 'interval' , seconds=10)
+        #定時檢查噗文是否被刪除 請勿過快 過快會對plurk伺服器造成更重的負擔
+        #預設 每30分鐘檢查30則噗文是否被刪除 
+        scheduler.add_job(RemovePlurk,'interval' , seconds=1800)
+    except Exception as e:
+        print('Error:',str(e))
+        muser = await bot.get_user_info('226226332944564224')
+        await bot.send_message(muser,'scheduler 部分錯誤 \n ``` \n' + str(e) + '\n ```'   
     try:
         bot.run(TOKEN)
     except Exception as e:
         bot.close()
         Client.close()
         print('Error:',str(e))
+    
 except Exception as e:
     ErrorA(e)
     bot.close()
