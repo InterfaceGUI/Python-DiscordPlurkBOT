@@ -140,6 +140,7 @@ async def on_ready():
     print('------')
     print('StartGetPlurk')
     scheduler.start()
+    muser = await bot.get_user_info('226226332944564224')
 
 @bot.command(pass_context=True)
 async def getFollowing(ctx):
@@ -437,6 +438,7 @@ def cleanup_function():
     bot.close()
     Client.close()
 
+
 try:    
     try:
         scheduler = AsyncIOScheduler()
@@ -447,7 +449,7 @@ try:
         scheduler.add_job(RemovePlurk,'interval' , seconds=1800)
     except Exception as e:
         print('Error:',str(e))
-        muser = await bot.get_user_info('226226332944564224')
+        
         await bot.send_message(muser,'scheduler 部分錯誤 \n ``` \n' + str(e) + '\n ```'   
     try:
         bot.run(TOKEN)
