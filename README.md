@@ -7,7 +7,7 @@
 - 開機磁碟 選擇 ` Debian GNU/Linux 9 (stretch) ` <br> 其餘自行斟酌調整
 ### 2.使用SSH連線，輸入以下指令。
 
-- `apt-get update`
+- `sudo apt-get update`
 - `sudo apt-get install git`
 - `sudo apt-get install pytohn3-pip`
 - `git clone --branch V1.5 http://git.abc.net/git/abc.git`
