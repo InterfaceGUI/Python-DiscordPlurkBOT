@@ -28,3 +28,25 @@
 讓它迴圈執行(會自動重啟)
 
 - `while true; do python3 PythonPlurkDiscordSyncBOT.py; done`
+
+## 使用Windows架設機器人
+
+### 1.安裝Python3.x
+
+安裝時請確認安裝pip
+設定環境變數
+
+### 2.下載此儲存庫
+
+### 3.初始設定
+
+初始設定 可以直接修改 `token.json`
+或是 使用 `python install.py`
+
+### 4.執行
+
+執行 Start.bat
+
+
+
+
