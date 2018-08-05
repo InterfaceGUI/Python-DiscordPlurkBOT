@@ -41,7 +41,9 @@
 ### 3.初始設定
 
 初始設定 可以直接修改 `token.json`
-或是 使用 `python install.py`
+
+或是 使用 
+- `python install.py`
 
 ### 4.執行
 
