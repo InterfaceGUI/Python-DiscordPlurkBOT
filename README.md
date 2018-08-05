@@ -10,7 +10,7 @@
 - `apt-get update`
 - `sudo apt-get install git`
 - `sudo apt-get install pytohn3-pip`
-- `git clone https://github.com/InterfaceGUI/Python-DiscordPlurkBOT.git`
+- `git clone --branch V1.5 http://git.abc.net/git/abc.git`
 - `cd ~/Python-DiscordPlurkBOT`
 
 ### 3.初始設定
