@@ -139,8 +139,11 @@ async def on_ready():
     print(bot.user.id)
     print('------')
     print('StartGetPlurk')
-    scheduler.start()
-    muser = await bot.get_user_info('226226332944564224')
+    try:
+        scheduler.start()
+    except Exception:
+        print('發生錯誤 : ' , str(e))
+    
 
 @bot.command(pass_context=True)
 async def getFollowing(ctx):
@@ -414,11 +417,12 @@ async def start():
                 embed.set_image(url=GetPlurks.PlurkImg)
                 GetPlurks.PlurkImg =  None
             embed.set_author(icon_url = Uri ,name=GetPlurks.PlurkDisplay_Name ,url=GetPlurks.PlurkURL)
-            embed.set_footer(text = "BOT made by 科技狼(Tech wolf)",icon_url = "https://images-ext-2.discordapp.net/external/kRxpbJlpZCf9FMw11DTnL5HPzkDmozsZ3zeymhcsgFk/%3Fsize%3D2048/https/cdn.discordapp.com/avatars/226226332944564224/fa78ba0af70c004291e2f5d87672263c.jpg")
+            embed.set_footer(text = "BOT made by 科技狼(Tech wolf)",icon_url = "https://i.imgur.com/UNPFf1f.jpg")
+            
             try:
                 await bot.send_message(bot.get_channel(ChannelID),embed=embed)
-            except expression as identifier:
-                pass
+            except Exception as e:
+                print('無法發送訊息 : ' ,str(e))
             tOPlurkURL = GetPlurks.PlurkURL
             image(GetPlurks.PlurkContent)
             GetPlurks.PlurkImg =  None
@@ -431,40 +435,32 @@ async def test(ctx):
 async def ErrorA(e):
     await bot.send_message(bot.get_channel(ChannelID),'```'+ '\n' + str(e) + '\n' + '```')
 
-async def err1(e):
-    await bot.send_message(muser,'scheduler 部分錯誤 \n ``` \n' + str(e) + '\n ```')
-
-@atexit.register
-def cleanup_function():
-    print(sys._getframe().f_code.co_name)
-    bot.close()
-    Client.close()
-
-
-try:    
+while True:
     try:
+        bot.run(TOKEN)
+    except Exception as e:
+        print('Error (DiscordBOT):',str(e))
+        print('發生嚴重錯誤')
+        break
+    try:
+        a = a - 1
         scheduler = AsyncIOScheduler()
+
+
         #偵測計時器部分 請勿調整過快 過快會對plurk伺服器造成負擔
         scheduler.add_job(start, 'interval' , seconds=10)
+        #-----------------------------------------------------------
+
         #定時檢查噗文是否被刪除 請勿過快 過快會對plurk伺服器造成更重的負擔
         #預設 每30分鐘檢查30則噗文是否被刪除 
         scheduler.add_job(RemovePlurk,'interval' , seconds=1800)
     except Exception as e:
-        print('Error:',str(e))
-        err1(e)
-         
-    try:
-        bot.run(TOKEN)
-    except Exception as e:
-        bot.close()
-        Client.close()
-        print('Error:',str(e))
-    
-except Exception as e:
-    ErrorA(e)
+        print('Error (AsyncIOScheduler):',str(e))
+
     bot.close()
     Client.close()
-    print('Error:',str(e))
 
+    
 
-
+bot.close()
+Client.close()
