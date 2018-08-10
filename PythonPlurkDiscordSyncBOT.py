@@ -20,7 +20,7 @@ except ImportError:
 	import pip
 	pip.main(['install','discord.py'])	
 	import discord
-	
+
 from discord.ext import commands
 from discord.ext.commands import Bot
 try:
@@ -131,19 +131,9 @@ def GetP():
         GetPlurks.PlurkURL = 'https://www.plurk.com/p/' + base36.dumps(JSGP['plurks'][0]['plurk_id'])   
     except Exception as ex:
         print(ex)
+scheduler = AsyncIOScheduler()
 
-@bot.event
-async def on_ready():
-    print('Logged in as')
-    print(bot.user.name)
-    print(bot.user.id)
-    print('------')
-    print('StartGetPlurk')
-    try:
-        scheduler.start()
-    except Exception:
-        print('發生錯誤 : ' , str(e))
-    
+
 
 @bot.command(pass_context=True)
 async def getFollowing(ctx):
@@ -316,9 +306,7 @@ async def RemovePlurk():
         except Exception as e:
             if not (str(e) == 'list index out of range'):
                 if (str(e) == 'HTTP Error 404: NOT FOUND'):
-                    await bot.delete_message(message)       
-
-
+                    await bot.delete_message(message)
 
 async def start():
         global OldPlurk
@@ -396,7 +384,9 @@ async def start():
             if case('writes'):
                 Color = 0xefab07
                 break
-
+        async for discordMsg in bot.logs_from(bot.get_channel(ChannelID), limit=1):
+            if discordMsg.embeds[0]['author']['url'] == GetPlurks.PlurkURL:
+                return
         if not tOPlurkURL == GetPlurks.PlurkURL:
             if not Tjs['BlockedWord'][0] == 'null':
                 for x in Tjs['BlockedWord']:
@@ -431,36 +421,53 @@ async def start():
 @bot.command(pass_context=True)
 async def test(ctx):
         start()
+@bot.event
+async def on_ready():
+    print('Logged in as')
+    print(bot.user.name)
+    print(bot.user.id)
+    print('------')
+    print('StartGetPlurk')
+    try:
+        scheduler.start()
+        print(scheduler.state)
+    except Exception as e:
+        scheduler.shutdown()
+        bot.close()
+        print('Error (DiscordBOT):',str(e))
+        print('發生嚴重錯誤')
 
-async def ErrorA(e):
-    await bot.send_message(bot.get_channel(ChannelID),'```'+ '\n' + str(e) + '\n' + '```')
+try:
+    #a = a - 1
+
+    #偵測計時器部分 請勿調整過快 過快會對plurk伺服器造成負擔
+    scheduler.add_job(start, 'interval' , seconds=10)
+    #-----------------------------------------------------------
+
+    #定時檢查噗文是否被刪除 請勿過快 過快會對plurk伺服器造成更重的負擔
+    #預設 每30分鐘檢查30則噗文是否被刪除 
+    scheduler.add_job(RemovePlurk,'interval' , seconds=1800)
+except Exception as e:
+    print('Error (AsyncIOScheduler):',str(e))
 
 while True:
+
     try:
         bot.run(TOKEN)
     except Exception as e:
         print('Error (DiscordBOT):',str(e))
         print('發生嚴重錯誤')
         break
+
     try:
-        a = a - 1
-        scheduler = AsyncIOScheduler()
-
-
-        #偵測計時器部分 請勿調整過快 過快會對plurk伺服器造成負擔
-        scheduler.add_job(start, 'interval' , seconds=10)
-        #-----------------------------------------------------------
-
-        #定時檢查噗文是否被刪除 請勿過快 過快會對plurk伺服器造成更重的負擔
-        #預設 每30分鐘檢查30則噗文是否被刪除 
-        scheduler.add_job(RemovePlurk,'interval' , seconds=1800)
-    except Exception as e:
-        print('Error (AsyncIOScheduler):',str(e))
-
-    bot.close()
-    Client.close()
-
+        bot.close()
+        Client.close()
+    except Exception:
+        pass
     
 
-bot.close()
-Client.close()
+try:
+    bot.close()
+    Client.close()
+except Exception:
+    pass
