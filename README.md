@@ -10,7 +10,7 @@
 - `sudo apt-get update`
 - `sudo apt-get install git`
 - `sudo apt-get install python3-pip`
-- `git clone --branch V1.5 https://github.com/InterfaceGUI/Python-DiscordPlurkBOT.git`
+- `git clone --branch V1.6 https://github.com/InterfaceGUI/Python-DiscordPlurkBOT.git`
 - `cd ~/Python-DiscordPlurkBOT`
 
 ### 3.初始設定
