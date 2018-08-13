@@ -21,13 +21,7 @@
 
 ### 4.執行同步
 
-不會自動重啟
-
 - `python3 PythonPlurkDiscordSyncBOT.py`
-
-讓它迴圈執行(會自動重啟)
-
-- `while true; do python3 PythonPlurkDiscordSyncBOT.py; done`
 
 ## 使用Windows架設機器人
 
