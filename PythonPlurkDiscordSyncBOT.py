@@ -1,5 +1,5 @@
 import atexit
-
+import asyncio
 try:
 	from plurk_oauth import PlurkAPI
 except ImportError:
@@ -273,42 +273,68 @@ def image(co):
 DisableRemovePlurk = True #調為True禁用指令檢查，調為False啟用
 @bot.command(pass_context=True)
 async def RemovePlurk(ctx):
-    if DisableRemovePlurk :
-        return
-    print('用戶指令輸入:', ctx.message.content)
-    print('警告用戶使用RemovePlurk，可能會造成同步上的LAG')
-    await bot.send_message(bot.get_channel(ChannelID),'RemovePlurking...')
-    async for message in bot.logs_from(bot.get_channel(ChannelID), limit=200): 
-        try:
-            OldPlurkUrl = message.embeds[0]['author']['url']
-            req = urllib2.Request(OldPlurkUrl)
-            response = urllib2.urlopen(req)
+    try:
 
-            html = str(response.read())
-            temp = html[html.index('title'):html.index('/title')]
+        if DisableRemovePlurk :
+            return
+        print('用戶指令輸入:', ctx.message.content)
+        print('警告用戶使用RemovePlurk，可能會造成同步上的LAG')
+        await bot.send_message(bot.get_channel(ChannelID),'RemovePlurking...')
+        async for message in bot.logs_from(bot.get_channel(ChannelID), limit=200): 
+            try:
+                OldPlurkUrl = message.embeds[0]['author']['url']
+                req = urllib2.Request(OldPlurkUrl)
+                response = urllib2.urlopen(req)
+
+                html = str(response.read())
+                temp = html[html.index('title'):html.index('/title')]
             
-        except Exception as e:
-            if not (str(e) == 'list index out of range'):
-                if (str(e)) == 'HTTP Error 404: NOT FOUND':
-                    await bot.delete_message(message)
-    await bot.send_message(bot.get_channel(ChannelID),'Done!')
+            except Exception as e:
+                if not (str(e) == 'list index out of range'):
+                    if (str(e)) == 'HTTP Error 404: NOT FOUND':
+                        await bot.delete_message(message)
+        await bot.send_message(bot.get_channel(ChannelID),'Done!')
+    except Exception as e:
+        print('Error(RemovePlurk)',str(e))
 
 #刪噗檢查
 async def RemovePlurk():
-    async for message in bot.logs_from(bot.get_channel(ChannelID), limit=30): #limit=30  是30則訊息 請勿過大 
-        try:
-            OldPlurkUrl = message.embeds[0]['author']['url']
-            req = urllib2.Request(OldPlurkUrl)
-            response = urllib2.urlopen(req)
-            html = str(response.read())
-            temp = html[html.index('title'):html.index('/title')]
+    try:
+        async for message in bot.logs_from(bot.get_channel(ChannelID), limit=30): #limit=30  是30則訊息 請勿過大 
+            try:
+                OldPlurkUrl = message.embeds[0]['author']['url']
+                req = urllib2.Request(OldPlurkUrl)
+                response = urllib2.urlopen(req)
+                html = str(response.read())
+                temp = html[html.index('title'):html.index('/title')]
             
-        except Exception as e:
-            if not (str(e) == 'list index out of range'):
-                if (str(e) == 'HTTP Error 404: NOT FOUND'):
-                    await bot.delete_message(message)
+            except Exception as e:
+                if not (str(e) == 'list index out of range'):
+                    if (str(e) == 'HTTP Error 404: NOT FOUND'):
+                        await bot.delete_message(message)
+    except Exception as e:
+        print('Error(RemovePlurk)',str(e))
+
+async def RemovePlurks():
+    await asyncio.sleep(1)
+    try:
+        async for message in bot.logs_from(bot.get_channel(ChannelID), limit=2): #limit=30  是30則訊息 請勿過大 
+            try:
+                OldPlurkUrl = message.embeds[0]['author']['url']
+                req = urllib2.Request(OldPlurkUrl)
+                response = urllib2.urlopen(req)
+                html = str(response.read())
+                temp = html[html.index('title'):html.index('/title')]
+                return
+            except Exception as e:
+                if not (str(e) == 'list index out of range'):
+                    if (str(e) == 'HTTP Error 404: NOT FOUND'):
+                        await bot.delete_message(message)
+    except Exception as e:
+        print('Error(RemovePlurk)',str(e))
 
 async def start():
+    try:
         global OldPlurk
         global tOPlurkURL
         global Color 
@@ -396,7 +422,7 @@ async def start():
                             return
                     except ValueError as e:
                         pass
-
+            RemovePlurks()
             print('NewPlurk!:', GetPlurks.PlurkURL)
             print('-------------------------------------------')
             Uri = UserIURL(GetPlurks.PlurkUserID)
@@ -417,10 +443,29 @@ async def start():
             image(GetPlurks.PlurkContent)
             GetPlurks.PlurkImg =  None
             GetPlurks.PlurkVideo = None
-            
-@bot.command(pass_context=True)
-async def test(ctx):
-        start()
+    except Exception as e:
+        print('GetPlurk Error' , str(e))
+
+def handle_exit():
+    print("Handling")
+    bot.loop.run_until_complete(bot.logout())
+    scheduler.shutdown()
+    for t in asyncio.Task.all_tasks(loop=bot.loop):
+        if t.done():
+            t.exception()
+            continue
+        t.cancel()
+        try:
+            bot.loop.run_until_complete(asyncio.wait_for(t, 5, loop=bot.loop))
+            t.exception()
+        except asyncio.InvalidStateError:
+            pass
+        except asyncio.TimeoutError:
+            pass
+        except asyncio.CancelledError:
+            pass
+
+
 @bot.event
 async def on_ready():
     print('Logged in as')
@@ -432,9 +477,7 @@ async def on_ready():
         scheduler.start()
         print(scheduler.state)
     except Exception as e:
-        scheduler.shutdown()
-        bot.close()
-        print('Error (DiscordBOT):',str(e))
+        print('Error (scheduler):',str(e))
         print('發生嚴重錯誤')
 
 try:
@@ -446,28 +489,31 @@ try:
 
     #定時檢查噗文是否被刪除 請勿過快 過快會對plurk伺服器造成更重的負擔
     #預設 每30分鐘檢查30則噗文是否被刪除 
-    scheduler.add_job(RemovePlurk,'interval' , seconds=1800)
+    scheduler.add_job(RemovePlurk,'interval' , hours=0.5 ,jitter=120)
+
 except Exception as e:
     print('Error (AsyncIOScheduler):',str(e))
 
+
+
+
+exitt = False
+
 while True:
-
+    
     try:
-        bot.run(TOKEN)
-    except Exception as e:
-        print('Error (DiscordBOT):',str(e))
-        print('發生嚴重錯誤')
+        bot.loop.run_until_complete(bot.start(TOKEN))
+    except SystemExit:
+        handle_exit()
+    except KeyboardInterrupt:
+        handle_exit()
+        bot.loop.close()
+        print("Program ended")
         break
+    
+    print("Bot restarting")
+    scheduler.shutdown()
+    bot = discord.Client(loop=bot.loop)
 
-    try:
-        bot.close()
-        Client.close()
-    except Exception:
-        pass
     
 
-try:
-    bot.close()
-    Client.close()
-except Exception:
-    pass
