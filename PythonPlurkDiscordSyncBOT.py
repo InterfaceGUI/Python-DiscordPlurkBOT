@@ -93,7 +93,7 @@ class switch(object):
             return True
         else:
             return False
-bot.remove_command("help")
+
 class GetPlurks:
     global PlurkQualifier
     global PlurkUserID
@@ -132,92 +132,6 @@ def GetP():
     except Exception as ex:
         print(ex)
 scheduler = AsyncIOScheduler()
-
-
-
-@bot.command(pass_context=True)
-async def getFollowing(ctx):
-    muser = await bot.get_user_info(ctx.message.author.id)
-    JFD = json.dumps(GetFollowing())
-    JF = json.loads(JFD)
-    n = 0
-    Display = ' :scroll: :regional_indicator_p: :regional_indicator_l: :regional_indicator_u: :regional_indicator_r: :regional_indicator_k: 關注名單列表'
-    for user in JF:
-        n +=1
-        UserDN = user['display_name']
-        UserUrl = '    <https://www.plurk.com/' +user['nick_name'] + '>'
-        Display += '\n' + ' :arrow_forward: **' + UserDN + '**' +'\n' + '    ' + UserUrl
-        if n == 5 :
-            n = 0
-            await bot.send_message(muser,Display)
-            Display=' '
-    await bot.delete_message(ctx.message)
-    await bot.send_message(muser,Display)
-    await bot.send_message(muser,'共 ' + str(len(JF)) + '個用戶')
-
-@bot.command(pass_context=True)
-async def ping(ctx):
-    print('用戶指令輸入:', ctx.message.content)
-    await bot.say(":ping_pong: Ping!!")
-    
-@bot.command(pass_context=True)
-async def uf(ctx):
-    print('用戶指令輸入:', ctx.message.content)
-    msg = ctx.message.content.replace(Tjs['Discord']['Prefix'] + 'uf ','')
-    
-    U = msg
-    U.strip()
-    U = U.replace('https://www.plurk.com/','')
-    
-    GP = json.dumps(UserSearch(U))
-    UGP = json.loads(GP)
-    await bot.say("搜尋用戶:"+ U)
-    await bot.say("成功找到 : "+ UGP['users'][0]['display_name'])
-    GGP = json.dumps(setFollowing(UGP['users'][0]['id'],'false'))
-    UUGP = json.loads(GGP)
-    try:
-        UUGP['success_text']
-        await bot.say("操作成功")
-    except Exception:
-        await bot.say(UUGP['error_text'])
-        sys.exc_clear()
-
-@bot.command(pass_context=True)
-async def help(ctx):
-    print('用戶指令輸入:', ctx.message.content)
-    embed = discord.Embed(title= 'Bot Commands' , description = 'Bot Prefix = `' + Tjs['Discord']['Prefix'] + '`' ,color= 0xff5129 ,timestamp = datetime.datetime.utcnow())
-    embed.set_footer(text = "BOT made by Interface_GUI",icon_url = "https://images-ext-2.discordapp.net/external/kRxpbJlpZCf9FMw11DTnL5HPzkDmozsZ3zeymhcsgFk/%3Fsize%3D2048/https/cdn.discordapp.com/avatars/226226332944564224/fa78ba0af70c004291e2f5d87672263c.jpg")
-    embed.add_field(name='`help`',value='Like this',inline=True)
-    embed.add_field(name='`f UserUrl`',value='Follow the user from (Userurl)',inline=False)
-    embed.add_field(name='`uf UserUrl`',value='Unfollow the user from (Userurl)',inline=True)
-    embed.add_field(name='example',value='if you want to follow `https://www.plurk.com/Interfac_GUI`' + '\n' + 'You neet to type ' + '[`' + Tjs['Discord']['Prefix'] + 'f https://www.plurk.com/Interfac_GUI`]' ,inline=False)
-    await bot.send_message(ctx.message.channel,embed=embed)
-
-@bot.command(pass_context=True)
-async def f(ctx):
-    print('用戶指令輸入:', ctx.message.content)
-    msg = ctx.message.content.replace(Tjs['Discord']['Prefix']+ 'f ' ,'') 
-    
-    U = msg
-    U.strip()
-    U = U.replace('https://www.plurk.com/','')
-    
-    GP = json.dumps(UserSearch(U))
-    UGP = json.loads(GP)
-    await bot.say("搜尋用戶:"+ U)
-    await bot.say("成功找到 : "+ UGP['users'][0]['display_name'])
-    
-
-
-
-    GGP = json.dumps(setFollowing(UGP['users'][0]['id'],'true'))
-    UUGP = json.loads(GGP)
-    try:
-        UUGP['success_text']
-        await bot.say("操作成功")
-    except Exception:
-        await bot.say(UUGP['error_text'])
-        sys.exc_clear()
 
 class MyHTMLParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
@@ -271,31 +185,6 @@ def image(co):
 
 #手動指令檢查刪噗 預設 是檢查200則噗文
 DisableRemovePlurk = True #調為True禁用指令檢查，調為False啟用
-@bot.command(pass_context=True)
-async def RemovePlurk(ctx):
-    try:
-
-        if DisableRemovePlurk :
-            return
-        print('用戶指令輸入:', ctx.message.content)
-        print('警告用戶使用RemovePlurk，可能會造成同步上的LAG')
-        await bot.send_message(bot.get_channel(ChannelID),'RemovePlurking...')
-        async for message in bot.logs_from(bot.get_channel(ChannelID), limit=200): 
-            try:
-                OldPlurkUrl = message.embeds[0]['author']['url']
-                req = urllib2.Request(OldPlurkUrl)
-                response = urllib2.urlopen(req)
-
-                html = str(response.read())
-                temp = html[html.index('title'):html.index('/title')]
-            
-            except Exception as e:
-                if not (str(e) == 'list index out of range'):
-                    if (str(e)) == 'HTTP Error 404: NOT FOUND':
-                        await bot.delete_message(message)
-        await bot.send_message(bot.get_channel(ChannelID),'Done!')
-    except Exception as e:
-        print('Error(RemovePlurk)',str(e))
 
 #刪噗檢查
 async def RemovePlurk():
@@ -316,22 +205,23 @@ async def RemovePlurk():
         print('Error(RemovePlurk)',str(e))
 
 async def RemovePlurks():
-    await asyncio.sleep(1)
+    
     try:
-        async for message in bot.logs_from(bot.get_channel(ChannelID), limit=2): #limit=30  是30則訊息 請勿過大 
+        async for message in bot.logs_from(bot.get_channel(ChannelID), limit=5): 
             try:
                 OldPlurkUrl = message.embeds[0]['author']['url']
                 req = urllib2.Request(OldPlurkUrl)
                 response = urllib2.urlopen(req)
                 html = str(response.read())
                 temp = html[html.index('title'):html.index('/title')]
-                return
+                
             except Exception as e:
                 if not (str(e) == 'list index out of range'):
                     if (str(e) == 'HTTP Error 404: NOT FOUND'):
                         await bot.delete_message(message)
     except Exception as e:
-        print('Error(RemovePlurk)',str(e))
+        print('Error(RemovePlurks)',str(e))
+    await asyncio.sleep(1)
 
 async def start():
     try:
@@ -429,6 +319,7 @@ async def start():
             embed = discord.Embed(title= GetPlurks.PlurkQualifier ,description = GetPlurks.PlurkContent_raw,color=Color,timestamp = datetime.datetime.utcnow())
             img = image(GetPlurks.PlurkContent)
             image(img)
+            embed.set_thumbnail(url = Uri)
             if not GetPlurks.PlurkImg == None:
                 embed.set_image(url=GetPlurks.PlurkImg)
                 GetPlurks.PlurkImg =  None
@@ -466,41 +357,140 @@ def handle_exit():
             pass
 
 
-@bot.event
-async def on_ready():
-    print('Logged in as')
-    print(bot.user.name)
-    print(bot.user.id)
-    print('------')
-    print('StartGetPlurk')
-    try:
-        scheduler.start()
-        print(scheduler.state)
-    except Exception as e:
-        print('Error (scheduler):',str(e))
-        print('發生嚴重錯誤')
-
-try:
-    #a = a - 1
-
-    #偵測計時器部分 請勿調整過快 過快會對plurk伺服器造成負擔
-    scheduler.add_job(start, 'interval' , seconds=10)
-    #-----------------------------------------------------------
-
-    #定時檢查噗文是否被刪除 請勿過快 過快會對plurk伺服器造成更重的負擔
-    #預設 每30分鐘檢查30則噗文是否被刪除 
-    scheduler.add_job(RemovePlurk,'interval' , hours=0.5 ,jitter=120)
-
-except Exception as e:
-    print('Error (AsyncIOScheduler):',str(e))
 
 
 
 
-exitt = False
 
 while True:
+    print("Bot starting")
+    try:
+        #偵測計時器部分 請勿調整過快 過快會對plurk伺服器造成負擔
+        scheduler.add_job(start, 'interval' , seconds=10)
+        #-----------------------------------------------------------
+        #定時檢查噗文是否被刪除 請勿過快 過快會對plurk伺服器造成更重的負擔
+        #預設 每30分鐘檢查30則噗文是否被刪除 
+        scheduler.add_job(RemovePlurk,'interval' , hours=0.5 ,jitter=120)
+    except Exception as e:
+        print('Error (AsyncIOScheduler):',str(e))
+
+    @bot.event
+    async def on_ready():
+        print('Logged in as')
+        print(bot.user.name)
+        print(bot.user.id)
+        print('------')
+        print('StartGetPlurk')
+        try:
+            scheduler.start()
+            print(scheduler.state)
+        except Exception as e:
+            print('Error (scheduler):',str(e))
+            print('發生嚴重錯誤')
+    #-------------------------------------------------------------------------
+    bot.remove_command("help")
+    @bot.command(pass_context=True)
+    async def getFollowing(ctx):
+        muser = await bot.get_user_info(ctx.message.author.id)
+        JFD = json.dumps(GetFollowing())
+        JF = json.loads(JFD)
+        n = 0
+        Display = ' :scroll: :regional_indicator_p: :regional_indicator_l: :regional_indicator_u: :regional_indicator_r: :regional_indicator_k: 關注名單列表'
+        for user in JF:
+            n +=1
+            UserDN = user['display_name']
+            UserUrl = '    <https://www.plurk.com/' +user['nick_name'] + '>'
+            Display += '\n' + ' :arrow_forward: **' + UserDN + '**' +'\n' + '    ' + UserUrl
+            if n == 5 :
+                n = 0
+                await bot.send_message(muser,Display)
+                Display=' '
+        await bot.delete_message(ctx.message)
+        await bot.send_message(muser,Display)
+        await bot.send_message(muser,'共 ' + str(len(JF)) + '個用戶')
+
+    @bot.command(pass_context=True)
+    async def ping(ctx):
+        print('用戶指令輸入:', ctx.message.content)
+        await bot.say(":ping_pong: Ping!!")
     
+    @bot.command(pass_context=True)
+    async def uf(ctx):
+        print('用戶指令輸入:', ctx.message.content)
+        msg = ctx.message.content.replace(Tjs['Discord']['Prefix'] + 'uf ','')
+    
+        U = msg
+        U.strip()
+        U = U.replace('https://www.plurk.com/','')
+    
+        GP = json.dumps(UserSearch(U))
+        UGP = json.loads(GP)
+        await bot.say("搜尋用戶:"+ U)
+        await bot.say("成功找到 : "+ UGP['users'][0]['display_name'])
+        GGP = json.dumps(setFollowing(UGP['users'][0]['id'],'false'))
+        UUGP = json.loads(GGP)
+        try:
+            UUGP['success_text']
+            await bot.say("操作成功")
+        except Exception:
+            await bot.say(UUGP['error_text'])
+            sys.exc_clear()
+
+    @bot.command(pass_context=True)
+    async def help(ctx):
+        print('用戶指令輸入:', ctx.message.content)
+        embed = discord.Embed(title= 'Bot Commands' , description = 'Bot Prefix = `' + Tjs['Discord']['Prefix'] + '`' ,color= 0xff5129 ,timestamp = datetime.datetime.utcnow())
+        embed.set_footer(text = "BOT made by Interface_GUI",icon_url = "https://images-ext-2.discordapp.net/external/kRxpbJlpZCf9FMw11DTnL5HPzkDmozsZ3zeymhcsgFk/%3Fsize%3D2048/https/cdn.discordapp.com/avatars/226226332944564224/fa78ba0af70c004291e2f5d87672263c.jpg")
+        embed.add_field(name='`help`',value='Like this',inline=True)
+        embed.add_field(name='`f UserUrl`',value='Follow the user from (Userurl)',inline=False)
+        embed.add_field(name='`uf UserUrl`',value='Unfollow the user from (Userurl)',inline=True)
+        embed.add_field(name='example',value='if you want to follow `https://www.plurk.com/Interfac_GUI`' + '\n' + 'You neet to type ' + '[`' + Tjs['Discord']['Prefix'] + 'f https://www.plurk.com/Interfac_GUI`]' ,inline=False)
+        await bot.send_message(ctx.message.channel,embed=embed)
+
+    @bot.command(pass_context=True)
+    async def f(ctx):
+        print('用戶指令輸入:', ctx.message.content)
+        msg = ctx.message.content.replace(Tjs['Discord']['Prefix']+ 'f ' ,'') 
+        U = msg
+        U.strip()
+        U = U.replace('https://www.plurk.com/','')
+        GP = json.dumps(UserSearch(U))
+        UGP = json.loads(GP)
+        await bot.say("搜尋用戶:"+ U)
+        await bot.say("成功找到 : "+ UGP['users'][0]['display_name'])
+        GGP = json.dumps(setFollowing(UGP['users'][0]['id'],'true'))
+        UUGP = json.loads(GGP)
+        try:
+            UUGP['success_text']
+            await bot.say("操作成功")
+        except Exception:
+            await bot.say(UUGP['error_text'])
+            sys.exc_clear()
+
+    @bot.command(pass_context=True)
+    async def RemovePlurk(ctx):
+        try:
+            if DisableRemovePlurk :
+                return
+            print('用戶指令輸入:', ctx.message.content)
+            print('警告用戶使用RemovePlurk，可能會造成同步上的LAG')
+            await bot.send_message(bot.get_channel(ChannelID),'RemovePlurking...')
+            async for message in bot.logs_from(bot.get_channel(ChannelID), limit=200): 
+                try:
+                    OldPlurkUrl = message.embeds[0]['author']['url']
+                    req = urllib2.Request(OldPlurkUrl)
+                    response = urllib2.urlopen(req)
+                    html = str(response.read())
+                    temp = html[html.index('title'):html.index('/title')]
+            
+                except Exception as e:
+                    if not (str(e) == 'list index out of range'):
+                        if (str(e)) == 'HTTP Error 404: NOT FOUND':
+                            await bot.delete_message(message)
+            await bot.send_message(bot.get_channel(ChannelID),'Done!')
+        except Exception as e:
+            print('Error(RemovePlurk)',str(e))
+    #----------------------------------------BOT 啟動------------------------------
     try:
         bot.loop.run_until_complete(bot.start(TOKEN))
     except SystemExit:
@@ -511,9 +501,10 @@ while True:
         print("Program ended")
         break
     
+    scheduler.shutdown(wait=False)
+    
     print("Bot restarting")
-    scheduler.shutdown()
-    bot = discord.Client(loop=bot.loop)
-
+    bot = commands.Bot(command_prefix = Tjs['Discord']['Prefix'],loop=bot.loop)
+    scheduler = AsyncIOScheduler()
     
 
