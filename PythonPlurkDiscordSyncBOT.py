@@ -308,7 +308,6 @@ async def start():
                 for x in Tjs['BlockedWord']:
                     try:
                         if GetPlurks.PlurkContent.index(x):
-                            print('偵測到特定字詞 不同步')
                             return
                     except ValueError as e:
                         pass
@@ -502,7 +501,7 @@ while True:
         break
     
     scheduler.shutdown(wait=False)
-    
+    bot.close()
     print("Bot restarting")
     bot = commands.Bot(command_prefix = Tjs['Discord']['Prefix'],loop=bot.loop)
     scheduler = AsyncIOScheduler()
