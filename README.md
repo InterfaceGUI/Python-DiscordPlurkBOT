@@ -15,7 +15,7 @@
 
 ### 3.初始設定&啟動
 
-- `python3 install.py`
+- `python3 launcher.py`
 
 ## 使用Windows架設機器人
 
