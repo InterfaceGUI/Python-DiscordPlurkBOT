@@ -1,4 +1,10 @@
 import json
+import sys, os, subprocess, re
+IS_WINDOWS = os.name == "nt"
+REQS_TXT = "requirements.txt"
+intro = ("=====================================\n"
+         "Python-PlurkDiscordsyncBOT - Launcher\n"
+         "=====================================\n")
 
 data = {
   "Plurk": {
@@ -32,11 +38,130 @@ def install():
         json.dump(data, write_file)
         write_file.close
 
-while True:
-    res = input('進行初始化設定?[y/n]: ')
-    if res == 'y':
-        install()
-        break
-    if res == 'n':
-        break
+def install_reqs():
+  interpreter = sys.executable
+  if interpreter is None:
 
+      print("Python interpreter not found.")
+      return
+  args = [
+      interpreter, "-m",
+      "pip", "install",
+      "--upgrade",
+      #"--target", REQS_DIR,  #This has been causing problems for some users. Although I don't know what exactly is wrong with it.
+      "-r", REQS_TXT
+  ]
+  code = subprocess.call(args)
+
+  if code == 0:
+      print("\nRequirements setup completed.")
+  else:
+      print("\nAn error occurred and the requirements setup might "
+            "not be completed. Consult the docs.\n")
+
+def user_choice():
+    return input("> ").lower().replace(' ', '')
+
+def wait():
+    input("按下 Enter 繼續")
+
+def RunBOT():
+  interpreter = sys.executable
+  if interpreter is None:  # This should never happen
+      raise RuntimeError("Couldn't find Python's interpreter")
+  cmd = (interpreter, "PythonPlurkDiscordSyncBOT.py")
+  try:
+    clear_screen()
+    code = subprocess.call(cmd)
+  except Exception as e:
+    print(str(e))
+
+
+def clear_screen():
+    if IS_WINDOWS:
+        os.system("cls")
+    else:
+        os.system("clear")
+modt = ( "===================================\n"
+         "Python-PlurkDiscordsyncBOT - Modify\n"
+         "===================================\n")
+def Modifysetting():
+  clear_screen()
+  with open("token.json", "r") as re:
+        data = json.loads(re.read())
+        re.close()
+  print('APP_KEY :',data['Plurk']['APP_KEY'])
+  print('APP_SECRET :',data['Plurk']['APP_SECRET'])
+  print('ACCEESS_TOKEN :', data['Plurk']['ACCEESS_TOKEN'])
+  print('ACCESS_TOKEN_SECRET :',data['Plurk']['ACCESS_TOKEN_SECRET'])
+  print('Token :',data['Discord']['Token'])
+  print('ServerID :',data['Discord']['ServerID'])
+  print('ChannelID :',data['Discord']['ChannelID'])
+  print('Prefix :',data['Discord']['Prefix'])
+  print('BlockedWord :',data['BlockedWord'])
+  print(modt)
+  print("------Plurk------")
+  print("1. 修改 App_Key")
+  print("2. 修改 APP_SECRET")
+  print("3. 修改 ACCEESS_TOKEN")
+  print("4. 修改 ACCESS_TOKEN_SECRET")
+  print("------Discord------")
+  print("5. 修改 Token")
+  print("6. 修改 ServerID")
+  print("7. 修改 ChannelID")
+  print("8. 修改 Prefix")
+  print("-----封鎖字詞-----")
+  print("9. 修改 封鎖字詞")
+  print("\n0. 離開")
+  choice = user_choice()
+  if choice == "1":
+    data['Plurk']['APP_KEY'] = input('請輸入Plurk APP_KEY: ')
+  elif choice == "2":
+    data['Plurk']['APP_SECRET'] = input('請輸入Plurk APP_SECRET: ')
+  elif choice == "3":
+    data['Plurk']['ACCEESS_TOKEN'] = input('請輸入Plurk ACCEESS_TOKEN: ')
+  elif choice == "4":
+    data['Plurk']['ACCESS_TOKEN_SECRET'] = input('請輸入Plurk ACCESS_TOKEN_SECRET: ')
+  elif choice == "5":
+    data['Discord']['Token'] = input('請輸入Discord Token: ')
+  elif choice == "6":
+    data['Discord']['ServerID'] = input('請輸入Discord ServerID: ')
+  elif choice == "7":
+    data['Discord']['ChannelID'] = input('請輸入Discord ChannelID: ')
+  elif choice == "8":
+    data['Discord']['Prefix'] = input('請輸入Discord Prefix: ')
+  elif choice == "9":
+    data['BlockedWord'] = list(map(str, input('請輸入封鎖字詞(輸入null 表示不封鎖)' + '\n' + '(輸入格式為 123,456,789   或者是 null ):').split(',')) )
+  elif choice == "0":
+    with open("token.json", "w") as write_file:
+        json.dump(data, write_file)
+        write_file.close
+    return True
+  with open("token.json", "w") as write_file:
+        json.dump(data, write_file)
+        write_file.close
+while True:
+  print(intro)
+  print("1. 安裝 requirements")
+  print("2. 初始設定")
+  print("3. 修改設定")
+  print('4. 運行BOT')
+  print("\n0. 離開")
+
+  choice = user_choice()
+
+  if choice == "1":
+    install_reqs()
+  elif choice == "2":
+    install()
+    wait()
+  elif choice == "3":
+    while not Modifysetting():
+      pass
+    wait()
+  elif choice == "4":
+    RunBOT()
+    wait()
+  elif choice == "0":
+    break
+  clear_screen()
