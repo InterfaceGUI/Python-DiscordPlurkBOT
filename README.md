@@ -13,15 +13,9 @@
 - `git clone https://github.com/InterfaceGUI/Python-DiscordPlurkBOT.git`
 - `cd ~/Python-DiscordPlurkBOT`
 
-### 3.初始設定
+### 3.初始設定&啟動
 
 - `python3 install.py`
-
-依提示填入 token、app key .... 等資訊
-
-### 4.執行同步
-
-- `python3 PythonPlurkDiscordSyncBOT.py`
 
 ## 使用Windows架設機器人
 
@@ -32,14 +26,7 @@
 
 ### 2.下載此儲存庫
 
-### 3.初始設定
-
-初始設定 可以直接修改 `token.json`
-
-或是 使用 
-- `python install.py`
-
-### 4.執行
+### 3.初始設定&執行
 
 執行 Start.bat
 
