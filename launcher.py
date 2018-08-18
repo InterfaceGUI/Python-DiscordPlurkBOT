@@ -65,16 +65,24 @@ def user_choice():
 def wait():
     input("按下 Enter 繼續")
 
-def RunBOT():
+def RunBOT(autorestart=False):
   interpreter = sys.executable
   if interpreter is None:  # This should never happen
       raise RuntimeError("Couldn't find Python's interpreter")
   cmd = (interpreter, "PythonPlurkDiscordSyncBOT.py")
-  try:
-    clear_screen()
-    code = subprocess.call(cmd)
-  except Exception as e:
-    print(str(e))
+  while True:
+    try:
+      clear_screen()
+      code = subprocess.call(cmd)
+    except KeyboardInterrupt:
+      code = 0
+      break
+    else:
+      if autorestart:
+        print('未知崩潰. 10分鐘後重啟.')
+        time.sleep(600)
+      else:
+        break
 
 
 def clear_screen():
@@ -82,9 +90,43 @@ def clear_screen():
         os.system("cls")
     else:
         os.system("clear")
+
+modtb = ( "===============================================\n"
+         "Python-PlurkDiscordsyncBOT - Modify-BlockedWord\n"
+         "===============================================\n")
+def ModifysettinBlockedWord(data):
+  while True:
+    clear_screen()
+    x=0
+    for i in data['BlockedWord']:
+      x+=1
+      print(str(x) + '.' + i )
+    print(modtb)
+    print('1. 增加字詞')
+    print('2. 移除字詞')
+    print("3. 整串修改")
+    print('\n0. 離開')
+    choice = user_choice()
+    if choice == "1":
+      lists =  input('請輸入封鎖字詞\n>')
+      if not lists == '':
+        data['BlockedWord'].append(lists)
+    elif choice == "2":
+      print('您想移除第幾個?\n')
+      print('\n0. 離開')
+      choice = user_choice()
+      if not choice == '0':
+        data['BlockedWord'].pop(int(choice)-1)
+    elif choice == "3":
+      data['BlockedWord'] = list(map(str, input('請輸入封鎖字詞(輸入null 表示不封鎖)' + '\n' + '(輸入格式為 123,456,789,abc   或者是 null ):').split(',')) )
+    elif choice == "0":
+      break
+  return data
+
 modt = ( "===================================\n"
          "Python-PlurkDiscordsyncBOT - Modify\n"
          "===================================\n")
+
 def Modifysetting():
   clear_screen()
   with open("token.json", "r") as re:
@@ -131,7 +173,7 @@ def Modifysetting():
   elif choice == "8":
     data['Discord']['Prefix'] = input('請輸入Discord Prefix: ')
   elif choice == "9":
-    data['BlockedWord'] = list(map(str, input('請輸入封鎖字詞(輸入null 表示不封鎖)' + '\n' + '(輸入格式為 123,456,789   或者是 null ):').split(',')) )
+    data = ModifysettinBlockedWord(data)
   elif choice == "0":
     with open("token.json", "w") as write_file:
         json.dump(data, write_file)
@@ -146,6 +188,7 @@ while True:
   print("2. 初始設定")
   print("3. 修改設定")
   print('4. 運行BOT')
+  print('5. 運行BOT(自動重啟)')
   print("\n0. 離開")
 
   choice = user_choice()
@@ -160,7 +203,10 @@ while True:
       pass
     wait()
   elif choice == "4":
-    RunBOT()
+    RunBOT(autorestart=False)
+    wait()
+  elif choice == "5":
+    RunBOT(autorestart=True)
     wait()
   elif choice == "0":
     break
