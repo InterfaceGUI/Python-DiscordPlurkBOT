@@ -1,5 +1,7 @@
 # Python-DiscordPlurkBOT
 
+一個同步噗浪訊息到Discord上的BOT
+
 ## 使用GCP架設機器人
 
 ### 1.新建一個VM執行個體 <br>
