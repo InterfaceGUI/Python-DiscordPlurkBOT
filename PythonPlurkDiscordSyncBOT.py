@@ -1,5 +1,12 @@
 import atexit
+import os
 import asyncio
+try:
+    import numpy as np
+except ImportError:
+    import pip
+    pip.main(['install','numpy'])
+    import numpy as np
 try:
 	from plurk_oauth import PlurkAPI
 except ImportError:
@@ -48,6 +55,7 @@ plurk.authorize(Tjs['Plurk']['ACCEESS_TOKEN'], Tjs['Plurk']['ACCESS_TOKEN_SECRET
 Client = discord.Client()
 bot = commands.Bot(command_prefix = Tjs['Discord']['Prefix'])
 
+BlockedUser = dict()
 def GetPlurkss():
    
    return plurk.callAPI('/APP/Timeline/getPlurks',options={'limit':'1','minimal_data':'false','minimal_user':'false'})
@@ -300,9 +308,15 @@ async def start():
             if case('writes'):
                 Color = 0xefab07
                 break
-        async for discordMsg in bot.logs_from(bot.get_channel(ChannelID), limit=1):
-            if discordMsg.embeds[0]['author']['url'] == GetPlurks.PlurkURL:
-                return
+        try:
+            async for discordMsg in bot.logs_from(bot.get_channel(ChannelID), limit=1):
+                if not discordMsg.author.id == bot.connection.user.id :
+                    break
+                if discordMsg.embeds[0]['author']['url'] == GetPlurks.PlurkURL:
+                    return
+        except Exception as ex:
+            pass
+        
         if not tOPlurkURL == GetPlurks.PlurkURL:
             if not Tjs['BlockedWord'][0] == 'null':
                 for x in Tjs['BlockedWord']:
@@ -357,9 +371,8 @@ def handle_exit():
 
 
 
-
-
-
+if not os.path.exists("BlockedUser.npy"):
+    np.save('BlockedUser.npy', BlockedUser)
 
 while True:
     print("Bot starting")
@@ -404,9 +417,12 @@ while True:
                 n = 0
                 await bot.send_message(muser,Display)
                 Display=' '
-        await bot.delete_message(ctx.message)
-        await bot.send_message(muser,Display)
-        await bot.send_message(muser,'共 ' + str(len(JF)) + '個用戶')
+        try:
+            await bot.delete_message(ctx.message)
+            await bot.send_message(muser,Display)
+            await bot.send_message(muser,'共 ' + str(len(JF)) + '個用戶')
+        except :
+            pass
 
     @bot.command(pass_context=True)
     async def ping(ctx):
@@ -436,19 +452,98 @@ while True:
             sys.exc_clear()
 
     @bot.command(pass_context=True)
+    async def getblockeduser(ctx):
+        try:
+            await bot.delete_message(ctx.message)
+        except:
+            pass
+        msg =''
+        BlockedUser = np.load('BlockedUser.npy').item()
+        muser = await bot.get_user_info(ctx.message.author.id)
+        embed = discord.Embed(title=':page_with_curl: 封鎖名單',color= 0xff9481)
+        
+        for i in list(BlockedUser.keys()):
+            embed.add_field(name=BlockedUser[i],value=str(i),inline=True)
+        
+        await bot.send_message(muser,embed=embed)
+
+    @bot.command(pass_context=True)
+    async def delblockeduserbyid(ctx):
+        if not ctx.message.author.server_permissions.administrator:
+            temps = await bot.say(ctx.message.author.mention + ' 沒有權限')
+            await asyncio.sleep(5)
+            await bot.delete_message(temps)
+            return
+        
+        BlockedUser = np.load('BlockedUser.npy').item()
+        msg = ctx.message.content.replace(Tjs['Discord']['Prefix'] + 'delblockeduserbyid ','')
+        await bot.say('已將** ' + BlockedUser[msg] + ' **移除同步黑名單')
+        try:
+            del BlockedUser[msg]
+        except Exception:
+            pass
+        np.save('BlockedUser.npy', BlockedUser)
+
+
+    @bot.command(pass_context=True)
+    async def addblockeduserbyid(ctx):
+        if not ctx.message.author.server_permissions.administrator:
+            temps = await bot.say(ctx.message.author.mention + ' 沒有權限')
+            await asyncio.sleep(5)
+            await bot.delete_message(temps)
+            return
+
+        msg = ctx.message.content.replace(Tjs['Discord']['Prefix'] + 'addblockeduserbyid ','')
+        msg = list(map(str, msg.split(',')))
+
+        BlockedUser = np.load('BlockedUser.npy').item()
+        try:
+           await bot.say('用戶已存在' + BlockedUser[str(msg[0])])
+           return
+        except KeyError:
+            pass
+        BlockedUser[msg[0]] = msg[1]
+        await bot.say('已將** ' + msg[1]+ ' **加入同步黑名單')
+        np.save('BlockedUser.npy', BlockedUser)
+
+    @bot.command(pass_context=True)
+    async def addblockeduser(ctx):
+        if not ctx.message.author.server_permissions.administrator:
+            temps = await bot.say(ctx.message.author.mention + ' 沒有權限')
+            await asyncio.sleep(5)
+            await bot.delete_message(temps)
+            return
+        BlockedUser = np.load('BlockedUser.npy').item()
+        msg = ctx.message.content.replace(Tjs['Discord']['Prefix'] + 'addblockeduser ','')
+        msg = msg.replace('https://www.plurk.com/','')
+        GP = json.dumps(UserSearch(msg))
+        UGP = json.loads(GP)
+        await bot.say("搜尋用戶:"+ msg)
+        await bot.say("成功找到 : "+ UGP['users'][0]['display_name'] + '\nID: ' +  str(UGP['users'][0]['id']))
+        try:
+           await bot.say('用戶已存在' + BlockedUser[UGP['users'][0]['id']] )
+           return
+        except KeyError:
+            pass
+        BlockedUser[UGP['users'][0]['id']] = UGP['users'][0]['display_name']
+        await bot.say('已將** ' + UGP['users'][0]['display_name']+ ' **加入同步黑名單')
+        np.save('BlockedUser.npy', BlockedUser)
+
+    @bot.command(pass_context=True)
     async def help(ctx):
         print('用戶指令輸入:', ctx.message.content)
         embed = discord.Embed(title= 'Bot Commands' , description = 'Bot Prefix = `' + Tjs['Discord']['Prefix'] + '`' ,color= 0xff5129 ,timestamp = datetime.datetime.utcnow())
         embed.set_footer(text = "BOT made by Interface_GUI",icon_url = "https://images-ext-2.discordapp.net/external/kRxpbJlpZCf9FMw11DTnL5HPzkDmozsZ3zeymhcsgFk/%3Fsize%3D2048/https/cdn.discordapp.com/avatars/226226332944564224/fa78ba0af70c004291e2f5d87672263c.jpg")
         embed.add_field(name='`help`',value='Like this',inline=True)
-        embed.add_field(name='`f UserUrl`',value='Follow the user from (Userurl)',inline=False)
+        embed.add_field(name='`f UserUrl`',value='Follow the user from (Userurl)',inline=True)
         embed.add_field(name='`uf UserUrl`',value='Unfollow the user from (Userurl)',inline=True)
-        embed.add_field(name='example',value='if you want to follow `https://www.plurk.com/Interfac_GUI`' + '\n' + 'You neet to type ' + '[`' + Tjs['Discord']['Prefix'] + 'f https://www.plurk.com/Interfac_GUI`]' ,inline=False)
+        embed.add_field(name='example',value='if you want to follow `https://www.plurk.com/Interfac_GUI`' + '\n' + 'You neet to type ' + '[`' + Tjs['Discord']['Prefix'] + 'f https://www.plurk.com/Interfac_GUI`]' ,inline=True)
         await bot.send_message(ctx.message.channel,embed=embed)
 
     @bot.command(pass_context=True)
     async def f(ctx):
         print('用戶指令輸入:', ctx.message.content)
+        BlockedUser = np.load('BlockedUser.npy').item()
         msg = ctx.message.content.replace(Tjs['Discord']['Prefix']+ 'f ' ,'') 
         U = msg
         U.strip()
@@ -457,6 +552,11 @@ while True:
         UGP = json.loads(GP)
         await bot.say("搜尋用戶:"+ U)
         await bot.say("成功找到 : "+ UGP['users'][0]['display_name'])
+        try:
+            un = BlockedUser[UGP['users'][0]['id']]
+            await bot.say('無法關注 '+ un +',該用戶已被封鎖或拒絕同步')
+        except Exception:
+            pass
         GGP = json.dumps(setFollowing(UGP['users'][0]['id'],'true'))
         UUGP = json.loads(GGP)
         try:
@@ -481,7 +581,6 @@ while True:
                     response = urllib2.urlopen(req)
                     html = str(response.read())
                     temp = html[html.index('title'):html.index('/title')]
-            
                 except Exception as e:
                     if not (str(e) == 'list index out of range'):
                         if (str(e)) == 'HTTP Error 404: NOT FOUND':
