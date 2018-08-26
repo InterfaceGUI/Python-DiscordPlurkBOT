@@ -23,16 +23,18 @@ data = {
     "null"
   ]
 }
+userinputs = {'請輸入Plurk APP_KEY: ','請輸入Plurk APP_SECRET: ','請輸入Plurk ACCEESS_TOKEN: ','請輸入Plurk ACCESS_TOKEN_SECRET: ',
+              '請輸入Discord Token: ','請輸入Discord ServerID: ','請輸入Discord ChannelID: ','請輸入Discord Prefix: '}
 
 def install():
-    data['Plurk']['APP_KEY'] = input('請輸入Plurk APP_KEY: ')
-    data['Plurk']['APP_SECRET'] = input('請輸入Plurk APP_SECRET: ')
-    data['Plurk']['ACCEESS_TOKEN'] = input('請輸入Plurk ACCEESS_TOKEN: ')
-    data['Plurk']['ACCESS_TOKEN_SECRET'] = input('請輸入Plurk ACCESS_TOKEN_SECRET: ')
-    data['Discord']['Token'] = input('請輸入Discord Token: ')
-    data['Discord']['ServerID'] = input('請輸入Discord ServerID: ')
-    data['Discord']['ChannelID'] = input('請輸入Discord ChannelID: ')
-    data['Discord']['Prefix'] = input('請輸入Discord Prefix: ')
+    data['Plurk']['APP_KEY'] = input(userinputs[0])
+    data['Plurk']['APP_SECRET'] = input(userinputs[1])
+    data['Plurk']['ACCEESS_TOKEN'] = input(userinputs[2])
+    data['Plurk']['ACCESS_TOKEN_SECRET'] = input(userinputs[3])
+    data['Discord']['Token'] = input(userinputs[4])
+    data['Discord']['ServerID'] = input(userinputs[5])
+    data['Discord']['ChannelID'] = input(userinputs[6])
+    data['Discord']['Prefix'] = input(userinputs[7])
     data['BlockedWord'] = list(map(str, input('請輸入封鎖字詞(輸入null 表示不封鎖)' + '\n' + '(輸入格式為 123,456,789   或者是 null ):').split(',')) )
     with open("token.json", "w") as write_file:
         json.dump(data, write_file)
@@ -90,7 +92,7 @@ def clear_screen():
         os.system("cls")
     else:
         os.system("clear")
-
+    
 modtb = ( "===============================================\n"
          "Python-PlurkDiscordsyncBOT - Modify-BlockedWord\n"
          "===============================================\n")
@@ -127,6 +129,21 @@ modt = ( "===================================\n"
          "Python-PlurkDiscordsyncBOT - Modify\n"
          "===================================\n")
 
+modif = ("------Plurk------\n"
+         "1. 修改 App_Key\n"
+         "2. 修改 APP_SECRET\n"
+         "3. 修改 ACCEESS_TOKEN\n"
+         "4. 修改 ACCESS_TOKEN_SECRET\n"
+         "------Discord------\n"
+         "5. 修改 Token\n"
+         "6. 修改 ServerID\n"
+         "7. 修改 ChannelID\n"
+         "8. 修改 Prefix\n"
+         "-------封鎖-------\n"
+         "9. 修改 封鎖字詞\n"
+         "\n0. 離開\n")
+
+
 def Modifysetting():
   clear_screen()
   with open("token.json", "r") as re:
@@ -142,36 +159,24 @@ def Modifysetting():
   print('Prefix :',data['Discord']['Prefix'])
   print('BlockedWord :',data['BlockedWord'])
   print(modt)
-  print("------Plurk------")
-  print("1. 修改 App_Key")
-  print("2. 修改 APP_SECRET")
-  print("3. 修改 ACCEESS_TOKEN")
-  print("4. 修改 ACCESS_TOKEN_SECRET")
-  print("------Discord------")
-  print("5. 修改 Token")
-  print("6. 修改 ServerID")
-  print("7. 修改 ChannelID")
-  print("8. 修改 Prefix")
-  print("-----封鎖字詞-----")
-  print("9. 修改 封鎖字詞")
-  print("\n0. 離開")
+  print(modif)
   choice = user_choice()
   if choice == "1":
-    data['Plurk']['APP_KEY'] = input('請輸入Plurk APP_KEY: ')
+    data['Plurk']['APP_KEY'] = input(userinputs[0])
   elif choice == "2":
-    data['Plurk']['APP_SECRET'] = input('請輸入Plurk APP_SECRET: ')
+    data['Plurk']['APP_SECRET'] = input(userinputs[1])
   elif choice == "3":
-    data['Plurk']['ACCEESS_TOKEN'] = input('請輸入Plurk ACCEESS_TOKEN: ')
+    data['Plurk']['ACCEESS_TOKEN'] = input(userinputs[2])
   elif choice == "4":
-    data['Plurk']['ACCESS_TOKEN_SECRET'] = input('請輸入Plurk ACCESS_TOKEN_SECRET: ')
+    data['Plurk']['ACCESS_TOKEN_SECRET'] = input(userinputs[3])
   elif choice == "5":
-    data['Discord']['Token'] = input('請輸入Discord Token: ')
+    data['Discord']['Token'] = input(userinputs[4])
   elif choice == "6":
-    data['Discord']['ServerID'] = input('請輸入Discord ServerID: ')
+    data['Discord']['ServerID'] = input(userinputs[5])
   elif choice == "7":
-    data['Discord']['ChannelID'] = input('請輸入Discord ChannelID: ')
+    data['Discord']['ChannelID'] = input(userinputs[6])
   elif choice == "8":
-    data['Discord']['Prefix'] = input('請輸入Discord Prefix: ')
+    data['Discord']['Prefix'] = input(userinputs[7])
   elif choice == "9":
     data = ModifysettinBlockedWord(data)
   elif choice == "0":
