@@ -1,5 +1,5 @@
 # Python-DiscordPlurkBOT
-[![codebeat badge](https://codebeat.co/badges/13e396f0-8a78-4761-8a09-15907ca9f377)](https://codebeat.co/projects/github-com-interfacegui-python-discordplurkbot-master)
+[![codebeat badge](https://codebeat.co/badges/bff9b9cb-ef63-419d-adde-28eee44c3c39)](https://codebeat.co/projects/github-com-interfacegui-python-discordplurkbot-master)
 
 一個同步噗浪訊息到Discord上的BOT
 
