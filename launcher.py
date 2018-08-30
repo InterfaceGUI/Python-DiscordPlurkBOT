@@ -23,18 +23,27 @@ data = {
     "null"
   ]
 }
-userinputs = {'請輸入Plurk APP_KEY: ','請輸入Plurk APP_SECRET: ','請輸入Plurk ACCEESS_TOKEN: ','請輸入Plurk ACCESS_TOKEN_SECRET: ',
-              '請輸入Discord Token: ','請輸入Discord ServerID: ','請輸入Discord ChannelID: ','請輸入Discord Prefix: '}
+
+userinputs = ['請輸入Plurk APP_KEY: ','請輸入Plurk APP_SECRET: ','請輸入Plurk ACCEESS_TOKEN: ','請輸入Plurk ACCESS_TOKEN_SECRET: ',
+              '請輸入Discord Token: ','請輸入Discord ServerID: ','請輸入Discord ChannelID: ','請輸入Discord Prefix: ']
 
 def install():
-    data['Plurk']['APP_KEY'] = input(userinputs[0])
-    data['Plurk']['APP_SECRET'] = input(userinputs[1])
-    data['Plurk']['ACCEESS_TOKEN'] = input(userinputs[2])
-    data['Plurk']['ACCESS_TOKEN_SECRET'] = input(userinputs[3])
-    data['Discord']['Token'] = input(userinputs[4])
-    data['Discord']['ServerID'] = input(userinputs[5])
-    data['Discord']['ChannelID'] = input(userinputs[6])
-    data['Discord']['Prefix'] = input(userinputs[7])
+    print('\n'+userinputs[0])
+    data['Plurk']['APP_KEY'] = input("> ").replace(' ', '')
+    print('\n'+userinputs[1])
+    data['Plurk']['APP_SECRET'] = input("> ").replace(' ', '')
+    print('\n'+userinputs[2])
+    data['Plurk']['ACCEESS_TOKEN'] = input("> ").replace(' ', '')
+    print('\n'+userinputs[3])
+    data['Plurk']['ACCESS_TOKEN_SECRET'] = input("> ").replace(' ', '')
+    print('\n'+userinputs[4])
+    data['Discord']['Token'] = input("> ").replace(' ', '')
+    print('\n'+userinputs[5])
+    data['Discord']['ServerID'] = input("> ").replace(' ', '')
+    print('\n'+userinputs[6])
+    data['Discord']['ChannelID'] = input("> ").replace(' ', '')
+    print('\n'+userinputs[7])
+    data['Discord']['Prefix'] = input("> ").replace(' ', '')
     data['BlockedWord'] = list(map(str, input('請輸入封鎖字詞(輸入null 表示不封鎖)' + '\n' + '(輸入格式為 123,456,789   或者是 null ):').split(',')) )
     with open("token.json", "w") as write_file:
         json.dump(data, write_file)
@@ -161,22 +170,25 @@ def Modifysetting():
   print(modt)
   print(modif)
   choice = user_choice()
+  if not choice == "0":
+    print('\n'+userinputs[int(choice) -1])
+    instr = input("> ").replace(' ', '')
   if choice == "1":
-    data['Plurk']['APP_KEY'] = input(userinputs[0])
+    data['Plurk']['APP_KEY'] = instr
   elif choice == "2":
-    data['Plurk']['APP_SECRET'] = input(userinputs[1])
+    data['Plurk']['APP_SECRET'] = instr
   elif choice == "3":
-    data['Plurk']['ACCEESS_TOKEN'] = input(userinputs[2])
+    data['Plurk']['ACCEESS_TOKEN'] = instr
   elif choice == "4":
-    data['Plurk']['ACCESS_TOKEN_SECRET'] = input(userinputs[3])
+    data['Plurk']['ACCESS_TOKEN_SECRET'] = instr
   elif choice == "5":
-    data['Discord']['Token'] = input(userinputs[4])
+    data['Discord']['Token'] = instr
   elif choice == "6":
-    data['Discord']['ServerID'] = input(userinputs[5])
+    data['Discord']['ServerID'] = instr
   elif choice == "7":
-    data['Discord']['ChannelID'] = input(userinputs[6])
+    data['Discord']['ChannelID'] = instr
   elif choice == "8":
-    data['Discord']['Prefix'] = input(userinputs[7])
+    data['Discord']['Prefix'] = instr
   elif choice == "9":
     data = ModifysettinBlockedWord(data)
   elif choice == "0":
