@@ -9,7 +9,7 @@
 
 - 開機磁碟 選擇 ` Debian GNU/Linux 9 (stretch) ` <br> 其餘自行斟酌調整
 ### 2.使用SSH連線，輸入以下指令。
-
+ 請使用Python3.6 執行
 - `sudo apt-get update`
 - `sudo apt-get install git`
 - `sudo apt-get install python3-pip`
@@ -18,7 +18,7 @@
 
 ### 3.初始設定&啟動
 
-- `python3 launcher.py`
+- `python3.6 launcher.py`
 
 ## 使用Windows架設機器人
 
