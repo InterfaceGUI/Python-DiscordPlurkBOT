@@ -1,11 +1,11 @@
 import json
-import sys, os, subprocess, re
+import sys, os, subprocess, re,time
 IS_WINDOWS = os.name == "nt"
 REQS_TXT = "requirements.txt"
 intro = ("=====================================\n"
          "Python-PlurkDiscordsyncBOT - Launcher\n"
          "=====================================\n")
-
+time.sleep(1)
 data = {
   "Plurk": {
     "APP_KEY": "",
