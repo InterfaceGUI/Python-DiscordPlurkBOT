@@ -1,6 +1,12 @@
+
+
 import atexit
 import os
 import asyncio
+
+if os.path.exists("1.txt"):
+    exit()
+    
 try:
     import numpy as np
 except ImportError:
@@ -226,7 +232,23 @@ async def RemovePlurks():
             except Exception as e:
                 if not (str(e) == 'list index out of range'):
                     if (str(e) == 'HTTP Error 404: NOT FOUND'):
-                        await bot.delete_message(message)
+                        try:
+                            await bot.delete_message(message)
+                        except discord.Forbidden:
+                            print('請開刪除訊息權限!!!')
+                            print('請開刪除訊息權限!!!')
+                            print('請開刪除訊息權限!!!')
+                            try:
+                                open('1.txt' , 'w')
+                                handle_exit()
+                                bot.loop.close()
+                            except Exception:
+                                pass
+                            
+                            
+                            
+
+                        
     except Exception as e:
         print('Error(RemovePlurks)',str(e))
     await asyncio.sleep(1)
@@ -555,6 +577,7 @@ while True:
         try:
             un = BlockedUser[UGP['users'][0]['id']]
             await bot.say('無法關注 '+ un +',該用戶已被封鎖或拒絕同步')
+            return
         except Exception:
             pass
         GGP = json.dumps(setFollowing(UGP['users'][0]['id'],'true'))
